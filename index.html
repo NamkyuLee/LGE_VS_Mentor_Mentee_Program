@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LG VS Mentor-Mentee Program</title>
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Background decorative blobs ── */
+    .bg-blobs {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.18;
+      filter: blur(2px);
+    }
+
+    .blob-1 {
+      width: 220px; height: 220px;
+      background: radial-gradient(circle, #c0c8d8, #8090a8);
+      top: 8%; left: 5%;
+    }
+    .blob-2 {
+      width: 140px; height: 140px;
+      background: radial-gradient(circle, #d0d8e8, #9aa8c0);
+      top: 3%; left: 22%;
+    }
+    .blob-3 {
+      width: 90px; height: 90px;
+      background: radial-gradient(circle, #b0bcd0, #7888a4);
+      top: 15%; left: 35%;
+      border-radius: 50%;
+    }
+    .blob-4 {
+      width: 180px; height: 180px;
+      background: radial-gradient(circle, #d8dce8, #a8b0c8);
+      bottom: 10%; right: 6%;
+      opacity: 0.14;
+    }
+    .blob-5 {
+      width: 260px; height: 260px;
+      background: radial-gradient(circle, #c8d0e0, #8898b8);
+      bottom: 5%; left: 10%;
+      opacity: 0.12;
+    }
+    .blob-6 {
+      width: 80px; height: 80px;
+      background: radial-gradient(circle, #b8c4d8, #8090b0);
+      top: 50%; right: 15%;
+      opacity: 0.16;
+    }
+    /* small pill shapes */
+    .pill {
+      position: absolute;
+      border-radius: 100px;
+      opacity: 0.20;
+      background: radial-gradient(circle, #c0c8d8, #7888a8);
+      filter: blur(1px);
+    }
+    .pill-1 { width: 60px; height: 26px; top: 12%; left: 48%; transform: rotate(-20deg); }
+    .pill-2 { width: 44px; height: 18px; top: 30%; right: 28%; transform: rotate(15deg); }
+    .pill-3 { width: 70px; height: 28px; bottom: 22%; left: 42%; transform: rotate(8deg); }
+
+    /* ── Nav bar ── */
+    nav {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      height: 64px;
+    }
+
+    .nav-logo {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: #ffffff;
+      white-space: nowrap;
+    }
+
+    .nav-logo span {
+      color: #A50034;
+    }
+
+    .btn-download {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #2a2a2e;
+      color: #fff;
+      font-size: 0.875rem;
+      font-weight: 600;
+      padding: 9px 20px;
+      border-radius: 100px;
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.12);
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .btn-download:hover {
+      background: #A50034;
+      border-color: #A50034;
+    }
+
+    .btn-download svg {
+      flex-shrink: 0;
+    }
+
+    /* ── Main layout ── */
+    main {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 40px 60px;
+      min-height: calc(100vh - 64px);
+    }
+
+    /* ── White card ── */
+    .card {
+      background: #f4f5f7;
+      border-radius: 24px;
+      width: 100%;
+      max-width: 1100px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      overflow: hidden;
+      min-height: 480px;
+    }
+
+    /* ── Video side ── */
+    .card-video {
+      position: relative;
+      background: #1a1a1e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border-radius: 24px 0 0 24px;
+    }
+
+    .card-video video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .video-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      color: rgba(255,255,255,0.4);
+      font-size: 0.9rem;
+      text-align: center;
+      padding: 40px;
+    }
+
+    .video-placeholder svg {
+      opacity: 0.3;
+    }
+
+    /* ── Mute toggle button ── */
+    .btn-mute {
+      position: absolute;
+      bottom: 14px;
+      right: 14px;
+      z-index: 5;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.55);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.2s;
+      backdrop-filter: blur(4px);
+    }
+
+    .btn-mute:hover {
+      background: rgba(165,0,52,0.8);
+      border-color: #A50034;
+    }
+
+    /* ── Content side ── */
+    .card-content {
+      padding: 52px 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 32px;
+    }
+
+    .card-header {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .card-eyebrow {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #A50034;
+    }
+
+    .card-title {
+      font-size: 2rem;
+      font-weight: 800;
+      line-height: 1.2;
+      color: #0f0f14;
+      letter-spacing: -0.03em;
+    }
+
+    .card-subtitle {
+      font-size: 0.9rem;
+      color: #6b7280;
+      line-height: 1.6;
+      margin-top: 4px;
+    }
+
+    /* ── Role sections ── */
+    .roles {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .role-block {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .role-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #0f0f14;
+      letter-spacing: -0.01em;
+    }
+
+    .role-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #A50034;
+      color: #fff;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 3px 9px;
+      border-radius: 100px;
+    }
+
+    .role-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .role-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 1.25rem;
+      color: #4b5563;
+      line-height: 1.55;
+    }
+
+    .role-list li::before {
+      content: "•";
+      color: #A50034;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* ── Divider ── */
+    .role-divider {
+      height: 1px;
+      background: rgba(0,0,0,0.07);
+      margin: 0;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      nav { padding: 0 20px; }
+
+      main { padding: 20px 16px 40px; }
+
+      .card {
+        grid-template-columns: 1fr;
+      }
+
+      .card-video {
+        border-radius: 24px 24px 0 0;
+        min-height: 240px;
+      }
+
+      .card-content {
+        padding: 36px 28px;
+      }
+
+      .card-title { font-size: 1.6rem; }
+
+      .nav-logo { font-size: 0.9rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background decorative shapes (abstract — no money/currency icons) -->
+  <div class="bg-blobs" aria-hidden="true">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    <div class="blob blob-4"></div>
+    <div class="blob blob-5"></div>
+    <div class="blob blob-6"></div>
+    <div class="pill pill-1"></div>
+    <div class="pill pill-2"></div>
+    <div class="pill pill-3"></div>
+  </div>
+
+  <!-- Navigation -->
+  <nav>
+    <div class="nav-logo">
+      <span>LG VS</span> Mentor-Mentee Program
+    </div>
+    <a
+      class="btn-download"
+      href="materials/Mentor_Mentee_Program en_v1.0.pdf"
+      download="Mentor_Mentee_Program_Guide.pdf"
+    >
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 1v9M4.5 6.5 8 10l3.5-3.5M2 12h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Guide Download
+    </a>
+  </nav>
+
+  <!-- Main content -->
+  <main>
+    <div class="card">
+
+      <!-- Left: Video -->
+      <div class="card-video">
+        <video
+          id="intro-video"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+        >
+          <source src="video/Lucy5_with_captions.mp4" type="video/mp4" />
+        </video>
+
+        <!-- Mute/unmute toggle -->
+        <button class="btn-mute" id="btn-mute" title="Toggle sound" aria-label="Toggle sound">
+          <!-- Muted icon (shown by default) -->
+          <svg id="icon-muted" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M11 5L6 9H2v6h4l5 4V5z" fill="currentColor"/>
+            <line x1="23" y1="9" x2="17" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <line x1="17" y1="9" x2="23" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <!-- Unmuted icon (hidden by default) -->
+          <svg id="icon-unmuted" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:none;">
+            <path d="M11 5L6 9H2v6h4l5 4V5z" fill="currentColor"/>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+
+        <!-- Shown only when video fails to load -->
+        <div class="video-placeholder" id="video-fallback" style="display:none;">
+          <svg width="56" height="56" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="2" y="4" width="20" height="16" rx="3" stroke="white" stroke-width="1.5"/>
+            <path d="M10 9l5 3-5 3V9z" fill="white"/>
+          </svg>
+          <span>Video will appear here.<br/>Place your MP4 file in the<br/><code>video/</code> folder.</span>
+        </div>
+      </div>
+
+      <!-- Right: Content -->
+      <div class="card-content">
+
+        <div class="card-header">
+          <p class="card-eyebrow">LG VS internal program</p>
+          <h1 class="card-title">Grow Together,<br/>Lead Together</h1>
+        </div>
+
+        <div class="roles">
+
+          <!-- Mentor -->
+          <div class="role-block">
+            <div class="role-title">
+              <span class="role-badge">Mentor</span>
+              Mentor's Role
+            </div>
+            <ul class="role-list">
+              <li>Be supportive, not evaluative</li>
+              <li>Guide your mentee on skills to build and challenges to overcome</li>
+              <li>Share experience to help solve real problems on the job</li>
+            </ul>
+          </div>
+
+          <div class="role-divider"></div>
+
+          <!-- Mentee -->
+          <div class="role-block">
+            <div class="role-title">
+              <span class="role-badge">Mentee</span>
+              Mentee's Role
+            </div>
+            <ul class="role-list">
+              <li>Be open and curious</li>
+              <li>Actively share struggles and questions</li>
+              <li>Apply your mentor's guidance to real work situations</li>
+            </ul>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Show fallback placeholder if video cannot load
+    const video = document.getElementById('intro-video');
+    const fallback = document.getElementById('video-fallback');
+    const btnMute = document.getElementById('btn-mute');
+    const iconMuted = document.getElementById('icon-muted');
+    const iconUnmuted = document.getElementById('icon-unmuted');
+
+    video.addEventListener('error', () => {
+      video.style.display = 'none';
+      fallback.style.display = 'flex';
+    });
+
+    video.addEventListener('loadedmetadata', () => {
+      fallback.style.display = 'none';
+      video.style.display = 'block';
+    });
+
+    // Mute / unmute toggle
+    btnMute.addEventListener('click', () => {
+      video.muted = !video.muted;
+      iconMuted.style.display = video.muted ? 'block' : 'none';
+      iconUnmuted.style.display = video.muted ? 'none' : 'block';
+    });
+  </script>
+
+</body>
+</html>
